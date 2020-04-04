@@ -1,13 +1,16 @@
 import os
 import secrets
+import imageio
+import numpy as np
+
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, abort, send_file
 from flaskblog import app, db, bcrypt, ssh, ftp
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf.file import FileField, FileAllowed
-
+from PIL import ImageEnhance, Image
 
 
 
@@ -101,6 +104,7 @@ def save_picture(form_picture):
 	picture_fn = random_hex + f_ext
 	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
 	process_picture(picture_path)
+	video_file = make_video(picture_path, 'output.jpg', seconds=2, fps=50)
 	i = Image.open(form_picture)
 	# i.thumbnail(output_size)
 
@@ -113,6 +117,50 @@ def process_picture(picture_path):
     _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
     stdout.read().decode('utf-8').strip()
     ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+
+
+###### Making video out of a picture
+
+def open_and_resize_image(input, max_height, max_width):
+    img = Image.open(input)
+    if img.height > max_height and img.height > img.width:
+        # vertical image
+        percentage_decrease = (max_height * 100) / img.height / 100
+        new_height = round(img.height * percentage_decrease)
+        new_width = round(img.width * percentage_decrease)
+        img = img.resize((new_width, new_height))
+
+    if (img.width > max_width and img.width > img.height) or (img.width == img.height and img.width > max_width):
+        # Horizontal image
+        percentage_decrease = (max_width * 100) / img.width / 100
+        new_height = round(img.height * percentage_decrease)
+        new_width = round(img.width * percentage_decrease)
+        img = img.resize((new_width, new_height))
+    img.save('new_size.jpg', 'JPEG')
+    return img
+
+
+def make_video(input, output, seconds=5, fps=4):
+    extra_duration = 5 * fps
+
+    total_frames = seconds * fps
+    color_percentage_for_each_frame = (100 / total_frames) / 100  # for the 0. mark
+
+    im = open_and_resize_image(input)
+    write_to = os.path.join('static', '{}.mp4'.format(output))
+
+    with imageio.get_writer(write_to, format='mp4', mode='I', fps=fps) as writer:
+        for i in range(total_frames + extra_duration):
+            if i < total_frames:
+                processed = ImageEnhance.Color(im).enhance(
+                    color_percentage_for_each_frame * i)
+                writer.append_data(np.asarray(processed))
+            else:
+                writer.append_data(np.asarray(im))
+    return write_to
+
+
+######
 
 
 @app.route("/editor", methods=['GET', 'POST'])

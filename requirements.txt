@@ -21,3 +21,5 @@ Werkzeug==0.16.0
 WTForms==2.2.1
 zope.interface==4.7.1
 paramiko==2.7.1
+imageio==2.8.0
+numpy==1.18.2
