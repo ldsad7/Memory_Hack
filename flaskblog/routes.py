@@ -100,7 +100,7 @@ def save_picture(form_picture):
 	_, f_ext = os.path.splitext(form_picture.filename)
 	picture_fn = random_hex + f_ext
 	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
-    process_picture(picture_path)
+	process_picture(picture_path)
 	i = Image.open(form_picture)
 	# i.thumbnail(output_size)
 
