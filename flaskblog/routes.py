@@ -96,6 +96,7 @@ def save_picture(form_picture):
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
+	print('here')
 	if request.method == 'POST':
 		# check if the post request has the file part
 		# if 'file' not in request.files:
