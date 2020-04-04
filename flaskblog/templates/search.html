@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+{% block content %}
+<style>
+	.wrapper{
+		border: none;
+		flex-direction: column;
+		padding-top: 50px;
+		padding: 50px 10%;
+	}
+	#search_input{
+		height: 70px;
+		width: 80%;
+		font-size: 30px;
+		padding-left: 30px;
+		margin-top: 40px;
+	}
+	.project{
+		width: 150%;
+		margin-top: 100px;
+	}
+	.project a{
+		display: block;
+		border: 1px solid #000;
+		padding: 30px;
+		margin: 30px 30px;
+		width: calc(50% - 60px);
+		float: left;
+	}
+	.project a:hover{
+		background: #000;
+		color: #fff;
+	}
+	.project a p{
+		font-size: 20px;
+		margin: 20px 0px;
+	}
+	.project ul li{
+		display: inline;
+		margin-right: 30px;
+	}
+</style>
+	<div class="wrapper">
+		<form method="POST" action="" enctype="multipart/form-data" class="form">
+			<h4>Поиск</h4>
+			<input type="search" id="search_input" autofocus {{form.info}}>
+			<div {visibility: {{hide}}} class="project">
+				<a href="">
+					<h3>{{name_1}}</h3>
+					<p>{{content_1}}</p>
+					<ul>
+						<li>tag1</li>
+						<li>tag2</li>
+						<li>tag3</li>
+						<li>tag4</li>
+					</ul>
+				</a>
+			</div>
+			</form>>
+	</div>
+{% endblock content %}
+	
