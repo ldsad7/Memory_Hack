@@ -2,7 +2,7 @@ import os
 import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
-from flaskblog import app, db, bcrypt
+from flaskblog import app, db, bcrypt, ssh, ftp
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
@@ -87,12 +87,20 @@ def save_picture(form_picture):
 	_, f_ext = os.path.splitext(form_picture.filename)
 	picture_fn = random_hex + f_ext
 	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
-	
+    process_picture(picture_path)
 	i = Image.open(form_picture)
 	# i.thumbnail(output_size)
-	
+
 	i.save(picture_path)
 	return picture_fn
+
+
+def process_picture(picture_path):
+    ftp.put(picture_path, '/content/DeOldify/result_images/tmp.png')
+    _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
+    stdout.read().decode('utf-8').strip()
+    ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
@@ -143,7 +151,7 @@ def main():
 # 		db.session.commit()
 # 		flash('Post has been created', 'success')
 # 		return redirect(url_for('home'))
-# 	return render_template('create_post.html', title='Добавить микросервис', 
+# 	return render_template('create_post.html', title='Добавить микросервис',
 # 						form  = form, legend = 'Добавить микросервис')
 
 
@@ -172,8 +180,8 @@ def main():
 # 		return redirect(url_for('post', post_id = post.id))
 # 	elif request.method == 'GET':
 # 		form.title.data = post.title
-# 		form.content.data = post.content	
-# 	return render_template('create_post.html', title='Update Post', 
+# 		form.content.data = post.content
+# 	return render_template('create_post.html', title='Update Post',
 # 							form  = form, legend = 'Update Post')
 
 # @app.route("/post/<int:post_id>/delete", methods=['POST'])
