@@ -225,3 +225,13 @@ body {
 .bottom_colorize span:before{
     background-image: url(../img/editor_icons/colorize.svg);
 }
+
+input {
+	position: absolute;
+	left: 30px;
+	top: 85px;
+	bottom: 0;
+	opacity: 0;
+	border: none;
+	cursor: pointer;
+}
