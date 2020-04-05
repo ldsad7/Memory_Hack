@@ -155,6 +155,11 @@ body {
     padding: 25px;
 }
 
+.dark {
+   background-color: #000000;
+   opacity: 0.5;
+}
+
 .empty_photo {
     border: 2px dashed #c4c4c4;
     margin-top: 10px;
@@ -173,11 +178,21 @@ body {
     text-align: center;
 }
 
+/* - {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+} */
+
 
 
 .bottom_panel {
     width: 100%;
     display: flex;
+    z-index: 2;
 }
 
 .bottom_btn {
@@ -203,7 +218,6 @@ body {
     position: absolute;
     height: 25px;
     width: 25px;
-    /* background-color:rgb(97, 179, 255); */
     top: -40px;
     left: 30%;  
     background-repeat: no-repeat; 
@@ -226,7 +240,7 @@ body {
     background-image: url(../img/editor_icons/colorize.svg);
 }
 
-input {
+.input_file {
 	position: absolute;
 	left: 30px;
 	top: 85px;

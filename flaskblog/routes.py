@@ -5,7 +5,7 @@ import random
 import numpy as np
 
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort, send_file
+from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response
 from flaskblog import app, db, bcrypt, ssh, ftp
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
@@ -167,6 +167,17 @@ def make_video(input, output, seconds=5, fps=4):
 
 ######
 
+@app.route("/upload_photo", methods=['GET', 'POST'])
+def upload():
+	if request.method == 'POST':
+		print(request.files)
+		file = request.files['file0']
+		if file.filename == '':
+			flash('No selected file')
+		if file:
+			filename = file.filename
+			file.save(filename)
+	return make_response({})
 
 ###### Adding text and audio to a picture
 
@@ -230,18 +241,13 @@ def concat_videos(videos, texts):
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
-	print('here')
 	if request.method == 'POST':
-		# check if the post request has the file part
-		# if 'file' not in request.files:
-			# flash('No file part')
-			# return redirect(request.url)
-		file = request.files['file']
-		# if user does not select file, browser also
-		# submit an empty part without filename
+		try:
+			file = request.files['file']
+		except KeyError:
+			return render_template('editor.html')
 		if file.filename == '':
 			flash('No selected file')
-			# return redirect(request.url)
 		if file:
 			filename = file.filename
 			file.save(filename)
