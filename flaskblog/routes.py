@@ -1,3 +1,4 @@
+import paramiko
 import os
 import secrets
 import imageio
@@ -17,7 +18,7 @@ from moviepy.editor import *
 RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
 TRANSITION_SIDES = ['left', 'right']
 COLORS = TextClip.list('color')
-FONTS = TextClip.list('font')
+# FONTS = TextClip.list('font')
 
 # @app.route('/')
 # @app.route("/register", methods=['GET', 'POST'])
@@ -125,7 +126,7 @@ def process_picture(picture_path):
         print('2')
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print('3')
-        ssh.connect('0.tcp.ngrok.io', username='root', password='YxjMnKEuRsHrsV1FQdn8ehATC4mG7B', port=11804)
+        ssh.connect('0.tcp.ngrok.io', username='root', password='HkfMQA590tiNIGZqYkERMUkiBmQDpo', port=19558)
         print('4')
 
         ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
@@ -138,7 +139,8 @@ def process_picture(picture_path):
             print('start exec scrypt')
             _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
             print('stop exec scrypt')
-            stdout.read().decode('utf-8').strip()
+            image_path = stdout.read().decode('utf-8').strip()
+            print('image_path:', image_path)
             print('start second ftp')
             ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
             print('stop second ftp')
@@ -146,8 +148,12 @@ def process_picture(picture_path):
 
 ###### Making video out of a picture
 
-def open_and_resize_image(input, max_height, max_width):
-    img = Image.open(input)
+def open_and_resize_image(input_):
+    img = Image.open(input_)
+
+    max_height = 1344
+    max_width = 1080
+
     if img.height > max_height and img.height > img.width:
         # vertical image
         percentage_decrease = (max_height * 100) / img.height / 100
@@ -203,7 +209,10 @@ def upload():
 		    print('STOP PROCESSING')
 		    print('START MAKING VIDEO')
 		    video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
-		    print('STOP MAKING VIDEO')
+		    print("STOP MAKING VIDEO")
+		    print('START CONCATING VIDEO')
+		    concat_videos([VideoFileClip(video_file)], ['some text here'])
+		    print('STOP CONCATING VIDEO')
 	return make_response({})
 
 ###### Adding text and audio to a picture
@@ -285,6 +294,9 @@ def editor():
             print('START MAKING VIDEO')
             video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
             print('STOP MAKING VIDEO')
+            print('START CONCATING VIDEO')
+            concat_videos([VideoFileClip(video_file)], ['some text here'])
+            print('STOP CONCATING VIDEO')
         # block button and tell that video will be soon...
     return render_template('editor.html')
 
