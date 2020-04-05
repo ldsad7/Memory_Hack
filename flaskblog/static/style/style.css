@@ -240,6 +240,7 @@ body {
     background-image: url(../img/editor_icons/colorize.svg);
 }
 
+<<<<<<< HEAD
 .btn_selected {
     background-color: #3267cd;
 }
@@ -254,4 +255,14 @@ body {
     border-radius: 10px;
     overflow: hidden;
     display: none;
+=======
+input {
+	position: absolute;
+	left: 30px;
+	top: 85px;
+	bottom: 0;
+	opacity: 0;
+	border: none;
+	cursor: pointer;
+>>>>>>> 163d8c619e5bca4e52dfc90731b1860b82ef312c
 }
