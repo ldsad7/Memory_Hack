@@ -239,20 +239,8 @@ def upload():
 		# if file.filename == '':
 		# 	flash('No selected file')
         # действие при нажатии на кнопку должно быть
-		if file:
-			filename = file.filename
-			picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
-			file.save(picture_path)
-			print('START PROCESSING')
-			process_picture(picture_path)
-			print('STOP PROCESSING')
-			print('START MAKING VIDEO')
-			key, video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
-			print("STOP MAKING VIDEO")
-			print('START CONCATING VIDEO')
-			concat_videos([VideoFileClip(video_file)], ['some text here'])
-			print('STOP CONCATING VIDEO')
-			return redirect(url_for(f'/video/{key}'))
+		# if file:
+			
 	return make_response({})
 
 ###### Adding text and audio to a picture
@@ -318,25 +306,20 @@ def concat_videos(videos, texts):
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
     if request.method == 'POST':
-        try:
-            file = request.files['file']
-        except KeyError:
-            return render_template('editor.html')
-        if file.filename == '':
-            flash('No selected file')
-        if file:
-            filename = file.filename
-            picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
-            file.save(picture_path)
-            print('START PROCESSING')
-            # process_picture(picture_path)
-            print('STOP PROCESSING')
-            print('START MAKING VIDEO')
-            video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
-            print('STOP MAKING VIDEO')
-            print('START CONCATING VIDEO')
-            concat_videos([VideoFileClip(video_file)], ['some text here'])
-            print('STOP CONCATING VIDEO')
+        # return redirect(url_for('/video/last'))
+        filename = file.filename
+        picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+        file.save(picture_path)
+        print('START PROCESSING')
+        process_picture(picture_path)
+        print('STOP PROCESSING')
+        print('START MAKING VIDEO')
+        key, video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+        print("STOP MAKING VIDEO")
+        print('START CONCATING VIDEO')
+        concat_videos([VideoFileClip(video_file)], ['some text here'])
+        print('STOP CONCATING VIDEO')
+        return redirect(url_for(f'/video/{key}'))
         # block button and tell that video will be soon...
         # return redirect(url_for(f'/video/{}'))
     return render_template('editor.html')
