@@ -97,6 +97,18 @@ body {
 
 /* НАСТРОЙКИ РЕДАКТОРА ВИДЕО */
 
+.shadow:before {
+    content: ' ';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    background-color: #000000;
+    opacity: .8;
+}
+
 .main {
     width: 100%;
     height: 100vh;
@@ -192,7 +204,7 @@ body {
 .bottom_panel {
     width: 100%;
     display: flex;
-    z-index: 2;
+    z-index: 10;
 }
 
 .bottom_btn {
@@ -240,29 +252,144 @@ body {
     background-image: url(../img/editor_icons/colorize.svg);
 }
 
-<<<<<<< HEAD
 .btn_selected {
     background-color: #3267cd;
 }
 
 .panels {
     width: 100%;
-    z-index: 1;
+    z-index: 5;
     position: fixed;
     background-color: #fff;
-    height: 80%;
+    height: 70%;
     bottom: 0;
     border-radius: 10px;
     overflow: hidden;
     display: none;
-=======
-input {
-	position: absolute;
-	left: 30px;
-	top: 85px;
-	bottom: 0;
-	opacity: 0;
-	border: none;
-	cursor: pointer;
->>>>>>> 163d8c619e5bca4e52dfc90731b1860b82ef312c
+    border: 1px solid #000;
+    
 }
+
+.panels_musik {
+    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    /* background-color: #121212; */
+    padding: 30px;
+    color: #000000;
+    font-size: 18px;
+    line-height: 21px;
+    display: none;
+}
+
+.music_item {
+    /* margin: 0;
+    padding-top: 10px;
+    padding-bottom: 10px; */
+}
+.panels_musik span {
+    display: inline-block;
+    background-repeat: no-repeat;
+}
+
+.panels_musik .radio_btn {
+    width: 20px;
+    height: 20px;
+    background-image: url(../img/editor_icons/track_list/unchecked.svg);
+    margin-right: 25px;
+}
+
+.panels_musik .play_btn {
+    width: 19px;
+    height: 19px;
+    background-image: url(../img/editor_icons/track_list/play.svg);
+    margin-right: 25px;
+}
+
+.panels_musik .pause_btn {
+    width: 15px;
+    height: 19px;
+    background-image: url(../img/editor_icons/track_list/pause.svg);
+    margin-right: 25px;
+}
+
+.panels_musik span.checked {
+    background-image: url(../img/editor_icons/track_list/checked.svg);
+}
+
+.panels_text {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    /* background-color: #aaa; */
+    padding: 16px;
+    color: #000000;
+    display: none;
+}
+
+.text_tabs {
+    font-size: 18px;
+    line-height: 21px;
+}
+
+.text_tabs span {
+    display: inline-block;
+    padding: 7px 24px;
+
+}
+
+.text_tabs span.current {
+    border-bottom: 2px solid #2284DE;
+}
+
+.panels_text p {
+    font-weight: 300;
+    font-size: 22px;
+    line-height: 25px;
+}
+
+.panels_text input {
+    width: 100%;
+    border: 0;
+    min-height: 180px;
+    padding-left: 5px;
+    font-size: 12px;
+    line-height: normal;
+    vertical-align: top;
+    box-shadow: inset -2px 2px 10px rgba(0,0,0,0.2);
+}
+
+.panels_text input {
+    font-size: 24px;
+    padding: 10px;
+    
+    color: red;
+    text-shadow: 0px 0px 0px #000;
+    -webkit-text-fill-color: transparent;
+}
+
+.text_area {
+    display: none;
+}
+
+.setting_area {
+    margin-top: 30px;
+}
+
+.setting_area > div {
+    margin-bottom: 40px;
+    display: flex;
+}
+
+.setting_area > div span{
+    margin: 0 5px;
+}
+
+.setting_area > div span:nth-child(1) {
+    margin-right: auto;
+}
+
+.show {
+    display: block;
+}
+
