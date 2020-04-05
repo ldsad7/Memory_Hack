@@ -17,7 +17,7 @@ from moviepy.editor import *
 
 RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
 TRANSITION_SIDES = ['left', 'right']
-COLORS = TextClip.list('color')
+# COLORS = TextClip.list('color')
 # FONTS = TextClip.list('font')
 
 # @app.route('/')
