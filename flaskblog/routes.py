@@ -148,7 +148,7 @@ def process_picture(picture_path):
         print('2')
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print('3')
-        ssh.connect('0.tcp.ngrok.io', username='root', password='Z2M6tf4cFkK4fDWg6bKnQZDJ98BXb5', port=17540)
+        ssh.connect('0.tcp.ngrok.io', username='root', password='Ip4ndwBW8ivnT6b1Qjm7DJ8uRcuujW', port=19197)
         print('4')
 
         ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
@@ -283,7 +283,7 @@ def concat_videos(videos, texts):
         # color = random.choice(COLORS).decode('utf-8')
         color = 'white'
         # font = random.choice(FONTS).decode('utf-8')
-        font = 'Times-New-Roman-Bold-Italic'
+        font = 'DejaVu-Sans'
         for j, line in enumerate(lines):
             txt_clip = TextClip(
                 line, fontsize=60, font=font, color=color
