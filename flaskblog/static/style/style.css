@@ -155,6 +155,11 @@ body {
     padding: 25px;
 }
 
+.dark {
+   background-color: #000000;
+   opacity: 0.5;
+}
+
 .empty_photo {
     border: 2px dashed #c4c4c4;
     margin-top: 10px;
@@ -173,11 +178,21 @@ body {
     text-align: center;
 }
 
+/* - {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+} */
+
 
 
 .bottom_panel {
     width: 100%;
     display: flex;
+    z-index: 2;
 }
 
 .bottom_btn {
@@ -203,7 +218,6 @@ body {
     position: absolute;
     height: 25px;
     width: 25px;
-    /* background-color:rgb(97, 179, 255); */
     top: -40px;
     left: 30%;  
     background-repeat: no-repeat; 
@@ -226,6 +240,22 @@ body {
     background-image: url(../img/editor_icons/colorize.svg);
 }
 
+<<<<<<< HEAD
+.btn_selected {
+    background-color: #3267cd;
+}
+
+.panels {
+    width: 100%;
+    z-index: 1;
+    position: fixed;
+    background-color: #fff;
+    height: 80%;
+    bottom: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    display: none;
+=======
 input {
 	position: absolute;
 	left: 30px;
@@ -234,4 +264,5 @@ input {
 	opacity: 0;
 	border: none;
 	cursor: pointer;
+>>>>>>> 163d8c619e5bca4e52dfc90731b1860b82ef312c
 }
