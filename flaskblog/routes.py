@@ -105,10 +105,11 @@ def get_video_url(video_id):
 
 @app.route('/video/<video_id>')
 def video_player(video_id):
+    # video_url = 22
     video_url = get_video_url(video_id)
     if video_url is False:
         return redirect(url_for('/'))
-    return render_template('video_player.html', video_url=video_url)
+    return render_template('result.html', video_url= '../' + video_url.split('flaskblog\\')[1], logo='../static/pictures/bg_world.png')
 
 @app.context_processor
 def override_url_for():
