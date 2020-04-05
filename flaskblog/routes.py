@@ -87,6 +87,9 @@ TRANSITION_SIDES = ['left', 'right']
 # def logout():
 # 	logout_user()
 # 	return redirect(url_for('register'))
+@app.route('/video/<video_id>')
+def video_player(video_id):
+    return render_template('video_player.html', video_id)
 
 @app.context_processor
 def override_url_for():
