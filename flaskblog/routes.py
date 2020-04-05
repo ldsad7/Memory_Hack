@@ -298,6 +298,10 @@ def editor():
             concat_videos([VideoFileClip(video_file)], ['some text here'])
             print('STOP CONCATING VIDEO')
         # block button and tell that video will be soon...
+        return render_template('editor.html', video={
+            'video': os.path.join(app.root_path, 'static', 'video', filename),
+            'poster': os.path.join(app.root_path, 'static', 'pictures', filename + '.processed')
+        })
     return render_template('editor.html')
 
 

@@ -28,6 +28,12 @@
                 </div>
             </form>
         </div>
+        {% if video %}
+            <video poster="{{ video['poster'] }}" id="player" playsinline controls>
+                <source src="{{ video['video'] }}" type="video/mp4">
+            </video>
+        {% endif %}
+
         <div class="bottom_panel">
             <button class="bottom_btn bottom_addphoto"><span>Еще фото</span></button>
             <button class="bottom_btn bottom_music"><span>Музыка</span></button>
@@ -42,7 +48,7 @@
 
             </div>
             <div class="panels_colorize">
-                
+
             </div>
         </div>
     </div>
