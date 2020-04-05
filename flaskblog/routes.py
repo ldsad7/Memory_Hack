@@ -7,13 +7,14 @@ import random
 import numpy as np
 
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response
+from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response, send_from_directory
 from flaskblog import app#, db, bcrypt
 # from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 # from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf.file import FileField, FileAllowed
 from PIL import ImageEnhance, Image
+from wtforms import StringField
 from moviepy.editor import *
 
 RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
@@ -103,9 +104,21 @@ def get_video_url(video_id):
     video_url = data.get(video_id, False)
     return video_url
 
-@app.route('/video/<video_id>')
+@app.route('/uploads/<video_id>', methods=['GET', 'POST'])
+def download(video_id):
+    # uploads = get_video_url(video_id).split('video\\')[0] + 'video\\'
+    filename = get_video_url(video_id).split('video\\')[1]
+    print(filename)
+    return send_from_directory('static/video/', filename)
+    # return send_file(get_video_url(video_id).split('flaskblog\\')[1], as_attachment=True)
+
+
+
+@app.route('/video/<video_id>', methods=['GET', 'POST'])
 def video_player(video_id):
     # video_url = 22
+    if request.method == 'POST':
+        download(video_id)
     video_url = get_video_url(video_id)
     if video_url is False:
         return redirect(url_for('/'))
@@ -211,8 +224,9 @@ def make_video(input, output, seconds=5, fps=4):
                 writer.append_data(np.asarray(processed))
             else:
                 writer.append_data(np.asarray(im))
-    append_video_url(secrets.token_hex(4), write_to)
-    return write_to
+    key = secrets.token_hex(4)
+    append_video_url(key, write_to)
+    return key, write_to
 
 
 ######
@@ -224,19 +238,21 @@ def upload():
 		file = request.files['file0']
 		# if file.filename == '':
 		# 	flash('No selected file')
+        # действие при нажатии на кнопку должно быть
 		if file:
-		    filename = file.filename
-		    picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
-		    file.save(picture_path)
-		    print('START PROCESSING')
-		    process_picture(picture_path)
-		    print('STOP PROCESSING')
-		    print('START MAKING VIDEO')
-		    video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
-		    print("STOP MAKING VIDEO")
-		    print('START CONCATING VIDEO')
-		    concat_videos([VideoFileClip(video_file)], ['some text here'])
-		    print('STOP CONCATING VIDEO')
+			filename = file.filename
+			picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+			file.save(picture_path)
+			print('START PROCESSING')
+			process_picture(picture_path)
+			print('STOP PROCESSING')
+			print('START MAKING VIDEO')
+			key, video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+			print("STOP MAKING VIDEO")
+			print('START CONCATING VIDEO')
+			concat_videos([VideoFileClip(video_file)], ['some text here'])
+			print('STOP CONCATING VIDEO')
+			return redirect(url_for(f'/video/{key}'))
 	return make_response({})
 
 ###### Adding text and audio to a picture
@@ -322,10 +338,7 @@ def editor():
             concat_videos([VideoFileClip(video_file)], ['some text here'])
             print('STOP CONCATING VIDEO')
         # block button and tell that video will be soon...
-        return render_template('editor.html', video={
-            'video': os.path.join(app.root_path, 'static', 'video', filename),
-            'poster': os.path.join(app.root_path, 'static', 'pictures', filename + '.processed')
-        })
+        # return redirect(url_for(f'/video/{}'))
     return render_template('editor.html')
 
 
