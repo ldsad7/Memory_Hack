@@ -67,6 +67,8 @@ $(function() {
         }
     }
 
+    
+
     let a = $('span.radio_btn').toArray();
     $(a[0]).click(() => {
         radio();
