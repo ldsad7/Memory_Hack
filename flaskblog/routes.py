@@ -111,16 +111,10 @@ def save_picture(form_picture):
 def editor():
 	print('here')
 	if request.method == 'POST':
-		# check if the post request has the file part
-		# if 'file' not in request.files:
-			# flash('No file part')
-			# return redirect(request.url)
+		print('hello')
 		file = request.files['file']
-		# if user does not select file, browser also
-		# submit an empty part without filename
 		if file.filename == '':
 			flash('No selected file')
-			# return redirect(request.url)
 		if file:
 			filename = file.filename
 			file.save(filename)
