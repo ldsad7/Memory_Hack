@@ -369,6 +369,9 @@ body {
 }
 
 .text_area {
+}
+
+.hide_option {
     display: none;
 }
 
@@ -396,4 +399,8 @@ body {
 input[type='file'] {
     width: 0.1px;
     height: 0.1px;
+}
+
+@media (min-width: 768px) {
+    
 }
