@@ -162,7 +162,7 @@ def process_picture(picture_path):
         print('2')
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print('3')
-        ssh.connect('0.tcp.ngrok.io', username='root', password='Ip4ndwBW8ivnT6b1Qjm7DJ8uRcuujW', port=19197)
+        ssh.connect('0.tcp.ngrok.io', username='root', password='JXUNxVDew00KGyvsr2Q33CJcDN4zkf', port=16580)
         print('4')
 
         ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
