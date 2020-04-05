@@ -1,18 +1,23 @@
 import os
 import secrets
 import imageio
+import random
 import numpy as np
 
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response
-from flaskblog import app, db, bcrypt, ssh, ftp
+from flaskblog import app, db, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf.file import FileField, FileAllowed
 from PIL import ImageEnhance, Image
+from moviepy.editor import *
 
-
+RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
+TRANSITION_SIDES = ['left', 'right']
+# COLORS = TextClip.list('color')
+# FONTS = TextClip.list('font')
 
 # @app.route('/')
 # @app.route("/register", methods=['GET', 'POST'])
@@ -98,30 +103,50 @@ def dated_url_for(endpoint, **values):
 class Picture:
 	picture = FileField('Загрузить фото', validators=[FileAllowed(['jpg', 'png'])])
 
-def save_picture(form_picture):
-	random_hex = secrets.token_hex(8)
-	_, f_ext = os.path.splitext(form_picture.filename)
-	picture_fn = random_hex + f_ext
-	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
-	process_picture(picture_path)
-	video_file = make_video(picture_path, 'output.jpg', seconds=2, fps=50)
-	i = Image.open(form_picture)
-	# i.thumbnail(output_size)
 
-	i.save(picture_path)
-	return picture_fn
+# def save_picture(form_picture):
+# 	random_hex = secrets.token_hex(8)
+# 	_, f_ext = os.path.splitext(form_picture.filename)
+# 	picture_fn = random_hex + f_ext
+# 	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
+# 	process_picture(picture_path)
+# 	video_file = make_video(picture_path, 'output.jpg', seconds=2, fps=50)
+# 	i = Image.open(form_picture)
+# 	# i.thumbnail(output_size)
+
+# 	i.save(picture_path)
+# 	return picture_fn
 
 
-def process_picture(picture_path):
-    ftp.put(picture_path, '/content/DeOldify/result_images/tmp.png')
-    _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
-    stdout.read().decode('utf-8').strip()
-    ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+# def process_picture(picture_path):
+#     ####### SSH
+#     print('1')
+#     with paramiko.SSHClient() as ssh:
+#         print('2')
+#         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#         print('3')
+#         ssh.connect('0.tcp.ngrok.io', username='root', password='YxjMnKEuRsHrsV1FQdn8ehATC4mG7B', port=11804)
+#         print('4')
+
+#         ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
+#         print('5')
+#         with ssh.open_sftp() as ftp:
+#             #######
+#             print('start first ftp')
+#             ftp.put(picture_path, '/content/DeOldify/result_images/tmp.png')
+#             print('stop first ftp')
+#             print('start exec scrypt')
+#             _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
+#             print('stop exec scrypt')
+#             stdout.read().decode('utf-8').strip()
+#             print('start second ftp')
+#             ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+#             print('stop second ftp')
 
 
 ###### Making video out of a picture
 
-def open_and_resize_image(input, max_height, max_width):
+def open_and_resize_image(input, max_height=0, max_width=0):
     img = Image.open(input)
     if img.height > max_height and img.height > img.width:
         # vertical image
@@ -136,7 +161,7 @@ def open_and_resize_image(input, max_height, max_width):
         new_height = round(img.height * percentage_decrease)
         new_width = round(img.width * percentage_decrease)
         img = img.resize((new_width, new_height))
-    img.save('new_size.jpg', 'JPEG')
+
     return img
 
 
@@ -147,7 +172,7 @@ def make_video(input, output, seconds=5, fps=4):
     color_percentage_for_each_frame = (100 / total_frames) / 100  # for the 0. mark
 
     im = open_and_resize_image(input)
-    write_to = os.path.join('static', '{}.mp4'.format(output))
+    write_to = os.path.join(app.root_path, 'static', 'video', '{}.mp4'.format(output))
 
     with imageio.get_writer(write_to, format='mp4', mode='I', fps=fps) as writer:
         for i in range(total_frames + extra_duration):
@@ -165,28 +190,105 @@ def make_video(input, output, seconds=5, fps=4):
 @app.route("/upload_photo", methods=['GET', 'POST'])
 def upload():
 	if request.method == 'POST':
-		# print(request.files)
+		print(f'request.files: {request.files}')
 		file = request.files['file0']
 		# if file.filename == '':
 		# 	flash('No selected file')
 		if file:
 			filename = file.filename
-			file.save(filename)
+			print('hi')
+		    # picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+		    # file.save(picture_path)
+		    # print('START PROCESSING')
+		    # # process_picture(picture_path)
+		    # print('STOP PROCESSING')
+		    # print('START MAKING VIDEO')
+		    # video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+		    # print('STOP MAKING VIDEO')
 	return make_response({})
+
+###### Adding text and audio to a picture
+
+def get_lines(text, N):
+    lines = []
+
+    cur_sum = 0
+    cur_line = []
+    for word in text.split():
+        word_len = len(word)
+        if cur_sum + word_len < N:
+            cur_line.append(word)
+            cur_sum += word_len
+        else:
+            lines.append(' '.join(cur_line))
+            cur_line = [word]
+            cur_sum = word_len
+    lines.append(' '.join(cur_line))
+    return lines
+
+
+def concat_videos(videos, texts):
+    width = max([video.w for video in videos])
+    height = max([video.h for video in videos])
+    N = width // 35  # max number of symbols in a line
+    processed_videos = []
+    duration = 0
+    for i, (video, text) in enumerate(zip(videos, texts)):
+        duration = video.duration
+        lines = get_lines(text, N)
+
+        transition = random.choice(RANDOM_TRANSITIONS)
+        transition_duration = random.random() * 2
+        if transition in ['crossfadein', 'crossfadeout', 'make_loopable']:
+            arr = [
+                video.fx(getattr(transfx, transition), transition_duration).resize(height=height)
+            ]
+        else:  # transition in ['slide_in', 'slide_out']
+            transition_side = random.choice(TRANSITION_SIDES)
+            arr = [
+                video.fx(getattr(transfx, transition), duration=transition_duration, side=transition_side).resize(height=height)
+            ]
+
+        # color = random.choice(COLORS).decode('utf-8')
+        color = 'white'
+        # font = random.choice(FONTS).decode('utf-8')
+        font = 'Times-New-Roman-Bold-Italic'
+        for j, line in enumerate(lines):
+            txt_clip = TextClip(
+                line, fontsize=60, font=font, color=color
+            ).set_position(('center', height - (len(lines) - j) * 100)).set_duration(duration)
+            arr.append(txt_clip)
+
+        processed_videos.append(CompositeVideoClip(arr))
+
+    result = concatenate_videoclips(processed_videos, padding=0, method='compose')
+    result = result.set_audio(AudioFileClip(os.path.join('static', 'audio', 'audio.mp3')).subclip(1, len(videos) * duration + 1))
+    result.write_videofile(os.path.join('static', 'video', 'result.mp4'), fps=25)
+
+#####
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
-	if request.method == 'POST':
-		try:
-			file = request.files['file']
-		except KeyError:
-			return render_template('editor.html')
-		if file.filename == '':
-			flash('No selected file')
-		if file:
-			filename = file.filename
-			file.save(filename)
-	return render_template('editor.html')
+    if request.method == 'POST':
+        try:
+            file = request.files['file']
+        except KeyError:
+            return render_template('editor.html')
+        if file.filename == '':
+            flash('No selected file')
+        if file:
+            filename = file.filename
+            picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+            file.save(picture_path)
+            print('START PROCESSING')
+            # process_picture(picture_path)
+            print('STOP PROCESSING')
+            print('START MAKING VIDEO')
+            video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+            print('STOP MAKING VIDEO')
+        # block button and tell that video will be soon...
+    return render_template('editor.html')
+
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
