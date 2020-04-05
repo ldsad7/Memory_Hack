@@ -1,6 +1,7 @@
 import os
 import secrets
 import imageio
+import random
 import numpy as np
 
 from PIL import Image
@@ -11,8 +12,12 @@ from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_wtf.file import FileField, FileAllowed
 from PIL import ImageEnhance, Image
+from moviepy.editor import *
 
-
+RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
+TRANSITION_SIDES = ['left', 'right']
+COLORS = TextClip.list('color')
+FONTS = TextClip.list('font')
 
 # @app.route('/')
 # @app.route("/register", methods=['GET', 'POST'])
@@ -136,7 +141,7 @@ def open_and_resize_image(input, max_height, max_width):
         new_height = round(img.height * percentage_decrease)
         new_width = round(img.width * percentage_decrease)
         img = img.resize((new_width, new_height))
-    img.save('new_size.jpg', 'JPEG')
+
     return img
 
 
@@ -162,6 +167,66 @@ def make_video(input, output, seconds=5, fps=4):
 
 ######
 
+
+###### Adding text and audio to a picture
+
+def get_lines(text, N):
+    lines = []
+
+    cur_sum = 0
+    cur_line = []
+    for word in text.split():
+        word_len = len(word)
+        if cur_sum + word_len < N:
+            cur_line.append(word)
+            cur_sum += word_len
+        else:
+            lines.append(' '.join(cur_line))
+            cur_line = [word]
+            cur_sum = word_len
+    lines.append(' '.join(cur_line))
+    return lines
+
+
+def concat_videos(videos, texts):
+    width = max([video.w for video in videos])
+    height = max([video.h for video in videos])
+    N = width // 35  # max number of symbols in a line
+    processed_videos = []
+    duration = 0
+    for i, (video, text) in enumerate(zip(videos, texts)):
+        duration = video.duration
+        lines = get_lines(text, N)
+
+        transition = random.choice(RANDOM_TRANSITIONS)
+        transition_duration = random.random() * 2
+        if transition in ['crossfadein', 'crossfadeout', 'make_loopable']:
+            arr = [
+                video.fx(getattr(transfx, transition), transition_duration).resize(height=height)
+            ]
+        else:  # transition in ['slide_in', 'slide_out']
+            transition_side = random.choice(TRANSITION_SIDES)
+            arr = [
+                video.fx(getattr(transfx, transition), duration=transition_duration, side=transition_side).resize(height=height)
+            ]
+
+        # color = random.choice(COLORS).decode('utf-8')
+        color = 'white'
+        # font = random.choice(FONTS).decode('utf-8')
+        font = 'Times-New-Roman-Bold-Italic'
+        for j, line in enumerate(lines):
+            txt_clip = TextClip(
+                line, fontsize=60, font=font, color=color
+            ).set_position(('center', height - (len(lines) - j) * 100)).set_duration(duration)
+            arr.append(txt_clip)
+
+        processed_videos.append(CompositeVideoClip(arr))
+
+    result = concatenate_videoclips(processed_videos, padding=0, method='compose')
+    result = result.set_audio(AudioFileClip(os.path.join('static', 'audio', 'audio.mp3')).subclip(1, len(videos) * duration + 1))
+    result.write_videofile(os.path.join('static', 'video', 'result.mp4'), fps=25)
+
+#####
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
