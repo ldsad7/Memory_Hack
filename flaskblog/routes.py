@@ -6,7 +6,7 @@ import numpy as np
 
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response
-from flaskblog import app, db, bcrypt, ssh, ftp
+from flaskblog import app, db, bcrypt
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
@@ -103,25 +103,45 @@ def dated_url_for(endpoint, **values):
 class Picture:
 	picture = FileField('Загрузить фото', validators=[FileAllowed(['jpg', 'png'])])
 
-def save_picture(form_picture):
-	random_hex = secrets.token_hex(8)
-	_, f_ext = os.path.splitext(form_picture.filename)
-	picture_fn = random_hex + f_ext
-	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
-	process_picture(picture_path)
-	video_file = make_video(picture_path, 'output.jpg', seconds=2, fps=50)
-	i = Image.open(form_picture)
-	# i.thumbnail(output_size)
 
-	i.save(picture_path)
-	return picture_fn
+# def save_picture(form_picture):
+# 	random_hex = secrets.token_hex(8)
+# 	_, f_ext = os.path.splitext(form_picture.filename)
+# 	picture_fn = random_hex + f_ext
+# 	picture_path = os.path.join(app.root_path, 'static/profile_pic', picture_fn)
+# 	process_picture(picture_path)
+# 	video_file = make_video(picture_path, 'output.jpg', seconds=2, fps=50)
+# 	i = Image.open(form_picture)
+# 	# i.thumbnail(output_size)
+
+# 	i.save(picture_path)
+# 	return picture_fn
 
 
 def process_picture(picture_path):
-    ftp.put(picture_path, '/content/DeOldify/result_images/tmp.png')
-    _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
-    stdout.read().decode('utf-8').strip()
-    ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+    ####### SSH
+    print('1')
+    with paramiko.SSHClient() as ssh:
+        print('2')
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        print('3')
+        ssh.connect('0.tcp.ngrok.io', username='root', password='YxjMnKEuRsHrsV1FQdn8ehATC4mG7B', port=11804)
+        print('4')
+
+        ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
+        print('5')
+        with ssh.open_sftp() as ftp:
+            #######
+            print('start first ftp')
+            ftp.put(picture_path, '/content/DeOldify/result_images/tmp.png')
+            print('stop first ftp')
+            print('start exec scrypt')
+            _, stdout, _ = ssh.exec_command("python3 /content/DeOldify/our_scrypt.py")
+            print('stop exec scrypt')
+            stdout.read().decode('utf-8').strip()
+            print('start second ftp')
+            ftp.get('/content/DeOldify/result_images/image.png', picture_path + '.processed')
+            print('stop second ftp')
 
 
 ###### Making video out of a picture
@@ -152,7 +172,7 @@ def make_video(input, output, seconds=5, fps=4):
     color_percentage_for_each_frame = (100 / total_frames) / 100  # for the 0. mark
 
     im = open_and_resize_image(input)
-    write_to = os.path.join('static', '{}.mp4'.format(output))
+    write_to = os.path.join(app.root_path, 'static', 'video', '{}.mp4'.format(output))
 
     with imageio.get_writer(write_to, format='mp4', mode='I', fps=fps) as writer:
         for i in range(total_frames + extra_duration):
@@ -170,13 +190,20 @@ def make_video(input, output, seconds=5, fps=4):
 @app.route("/upload_photo", methods=['GET', 'POST'])
 def upload():
 	if request.method == 'POST':
-		print(request.files)
+		print(f'request.files: {request.files}')
 		file = request.files['file0']
 		if file.filename == '':
 			flash('No selected file')
 		if file:
-			filename = file.filename
-			file.save(filename)
+		    filename = file.filename
+		    picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+		    file.save(picture_path)
+		    print('START PROCESSING')
+		    process_picture(picture_path)
+		    print('STOP PROCESSING')
+		    print('START MAKING VIDEO')
+		    video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+		    print('STOP MAKING VIDEO')
 	return make_response({})
 
 ###### Adding text and audio to a picture
@@ -241,17 +268,26 @@ def concat_videos(videos, texts):
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
-	if request.method == 'POST':
-		try:
-			file = request.files['file']
-		except KeyError:
-			return render_template('editor.html')
-		if file.filename == '':
-			flash('No selected file')
-		if file:
-			filename = file.filename
-			file.save(filename)
-	return render_template('editor.html')
+    if request.method == 'POST':
+        try:
+            file = request.files['file']
+        except KeyError:
+            return render_template('editor.html')
+        if file.filename == '':
+            flash('No selected file')
+        if file:
+            filename = file.filename
+            picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
+            file.save(picture_path)
+            print('START PROCESSING')
+            process_picture(picture_path)
+            print('STOP PROCESSING')
+            print('START MAKING VIDEO')
+            video_file = make_video(picture_path, '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
+            print('STOP MAKING VIDEO')
+        # block button and tell that video will be soon...
+    return render_template('editor.html')
+
 
 @app.route("/", methods=['GET', 'POST'])
 def main():
