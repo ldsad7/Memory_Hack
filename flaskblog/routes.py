@@ -17,7 +17,7 @@ from moviepy.editor import *
 
 RANDOM_TRANSITIONS = ['crossfadein', 'crossfadeout', 'slide_in', 'slide_out', 'make_loopable']
 TRANSITION_SIDES = ['left', 'right']
-COLORS = TextClip.list('color')
+# COLORS = TextClip.list('color')
 # FONTS = TextClip.list('font')
 
 # @app.route('/')
@@ -198,8 +198,8 @@ def upload():
 	if request.method == 'POST':
 		print(f'request.files: {request.files}')
 		file = request.files['file0']
-		if file.filename == '':
-			flash('No selected file')
+		# if file.filename == '':
+		# 	flash('No selected file')
 		if file:
 		    filename = file.filename
 		    picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
@@ -289,7 +289,7 @@ def editor():
             picture_path = os.path.join(app.root_path, 'static', 'pictures', filename)
             file.save(picture_path)
             print('START PROCESSING')
-            process_picture(picture_path)
+            # process_picture(picture_path)
             print('STOP PROCESSING')
             print('START MAKING VIDEO')
             video_file = make_video(picture_path + '.processed', '.'.join(filename.split('.')[:-1]), seconds=2, fps=50)
