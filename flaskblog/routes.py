@@ -165,10 +165,10 @@ def make_video(input, output, seconds=5, fps=4):
 @app.route("/upload_photo", methods=['GET', 'POST'])
 def upload():
 	if request.method == 'POST':
-		print(request.files)
+		# print(request.files)
 		file = request.files['file0']
-		if file.filename == '':
-			flash('No selected file')
+		# if file.filename == '':
+		# 	flash('No selected file')
 		if file:
 			filename = file.filename
 			file.save(filename)
