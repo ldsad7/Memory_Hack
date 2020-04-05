@@ -126,7 +126,7 @@ def process_picture(picture_path):
         print('2')
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         print('3')
-        ssh.connect('0.tcp.ngrok.io', username='root', password='HkfMQA590tiNIGZqYkERMUkiBmQDpo', port=19558)
+        ssh.connect('0.tcp.ngrok.io', username='root', password='cbs6k55wSQ9dJuS3DMOgPqKFZYZyg8', port=18145)
         print('4')
 
         ssh.exec_command("python3 -m pip install -r /content/DeOldify/colab_requirements.txt")
@@ -270,8 +270,8 @@ def concat_videos(videos, texts):
         processed_videos.append(CompositeVideoClip(arr))
 
     result = concatenate_videoclips(processed_videos, padding=0, method='compose')
-    result = result.set_audio(AudioFileClip(os.path.join('static', 'audio', 'audio.mp3')).subclip(1, len(videos) * duration + 1))
-    result.write_videofile(os.path.join('static', 'video', 'result.mp4'), fps=25)
+    result = result.set_audio(AudioFileClip(os.path.join(app.root_path, 'static', 'audio', 'audio.mp3')).subclip(1, len(videos) * duration + 1))
+    result.write_videofile(os.path.join(app.root_path, 'static', 'video', 'result.mp4'), fps=25)
 
 #####
 
