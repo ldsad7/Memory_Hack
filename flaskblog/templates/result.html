@@ -7,40 +7,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../static/style/style.css">
     <script src="../static/scripts/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.5.10/plyr.css" />
+    <script src="https://cdn.plyr.io/3.5.10/plyr.js"></script>
+    <script>
+        const player = new Plyr('#player');
+    </script>
     <script src="../static/scripts/main.js"></script>
 </head>
 <body>
     <div class="main">
         <div class="top_panel">
             <button class="top_back"></button>
-            <button class="top_share"></button>
+            <!-- <button class="top_share"></button>
+            <button class="top_save">Сохранить</button> -->
+        </div>
+        <div class="content_container_v">
+            <video poster="{{ logo }}" id="player" playsinline controls>
+                <source src="{{ video_url }}" type="video/mp4" />
+                <!-- <source src="/path/to/video.webm" type="video/webm" /> -->
+            
+                <!-- Captions are optional -->
+                <!-- <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default /> -->
+            </video>      
+        </div>
+        <!-- <div class="bottom_panel_v"> -->
+        <form method="post" class="bottom_panel_v">
+            <button class="top_share_v">Поделиться</button>
             <button class="top_save">Сохранить</button>
-        </div>
-        <div class="content_container">
-            <form method="POST" action="" enctype="multipart/form-data" class="form">
-                <label for='file'>
-                <div class="empty_photo">
-                    <div class="empty_button">
-                        <img src="../static/img/editor_icons/emptyphoto.svg" alt="">
-                            <h2 class="empty_header">Загрузите первую фотографию</h2>
-                            <input type='file' id='file'>
-                    </div>
-                </div>
-            </label>
-            </form>
-        </div>
-        {% if video %}
-            <video poster="{{ video['poster'] }}" id="player" playsinline controls>
-                <source src="{{ video['video'] }}" type="video/mp4">
-            </video>
-        {% endif %}
-
-        <div class="bottom_panel">
-            <button class="bottom_btn bottom_addphoto"><span>Еще фото</span></button>
-            <button class="bottom_btn bottom_music"><span>Музыка</span></button>
-            <button class="bottom_btn bottom_text"><span>Текст</span></button>
-            <button class="bottom_btn bottom_colorize"><span>Результат</span></button>
-        </div>
+        </form>
+        <!-- </div> -->
         <div class="panels">
             <div class="panels_musik">
                 <p class="musik_item">
