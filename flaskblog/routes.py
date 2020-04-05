@@ -1,4 +1,5 @@
 import paramiko
+import json
 import os
 import secrets
 import imageio
@@ -87,9 +88,27 @@ TRANSITION_SIDES = ['left', 'right']
 # def logout():
 # 	logout_user()
 # 	return redirect(url_for('register'))
+
+
+def append_video_url(video_id, video_url):
+    with open('url_data.json', 'r') as fd:
+        data = json.loads(fd.read())
+    data[video_id] = video_url
+    with open('url_data.json', 'w') as fd:
+        fd.write(json.dumps(data))
+
+def get_video_url(video_id):
+    with open('url_data.json', 'r') as fd:
+        data = json.loads(fd.read())
+    video_url = data.get(video_id, False)
+    return video_url
+
 @app.route('/video/<video_id>')
 def video_player(video_id):
-    return render_template('video_player.html', video_id=video_id)
+    video_url = get_video_url(video_id)
+    if video_url is False:
+        return redirect(url_for('/'))
+    return render_template('video_player.html', video_url=video_url)
 
 @app.context_processor
 def override_url_for():
@@ -191,6 +210,7 @@ def make_video(input, output, seconds=5, fps=4):
                 writer.append_data(np.asarray(processed))
             else:
                 writer.append_data(np.asarray(im))
+    append_video_url(secrets.token_hex(4), write_to)
     return write_to
 
 
