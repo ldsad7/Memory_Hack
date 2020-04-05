@@ -4,7 +4,7 @@ import imageio
 import numpy as np
 
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort, send_file
+from flask import render_template, url_for, flash, redirect, request, abort, send_file, make_response
 from flaskblog import app, db, bcrypt, ssh, ftp
 from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskblog.models import User, Post
@@ -162,13 +162,25 @@ def make_video(input, output, seconds=5, fps=4):
 
 ######
 
+@app.route("/upload_photo", methods=['GET', 'POST'])
+def upload():
+	if request.method == 'POST':
+		print(request.files)
+		file = request.files['file0']
+		if file.filename == '':
+			flash('No selected file')
+		if file:
+			filename = file.filename
+			file.save(filename)
+	return make_response({})
 
 @app.route("/editor", methods=['GET', 'POST'])
 def editor():
-	print('here')
 	if request.method == 'POST':
-		print('hello')
-		file = request.files['file']
+		try:
+			file = request.files['file']
+		except KeyError:
+			return render_template('editor.html')
 		if file.filename == '':
 			flash('No selected file')
 		if file:

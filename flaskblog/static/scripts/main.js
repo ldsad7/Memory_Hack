@@ -1,7 +1,7 @@
 $(function() {
     let files;
     let fdata = new FormData();
-    $("inpit[type=file]").on("change", function (e) {
+    $("input[type=file]").on("change", function (e) {
         files = this.files;
 
         $.each(files, function (i, file) {
@@ -10,7 +10,7 @@ $(function() {
 
         $.ajax({
             url: "/upload_photo",
-            type: "post",
+            type: "POST",
             data: fdata, 
             processData: false, 
             contentType: false, 

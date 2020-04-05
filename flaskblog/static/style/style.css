@@ -240,23 +240,7 @@ body {
     background-image: url(../img/editor_icons/colorize.svg);
 }
 
-<<<<<<< HEAD
-.btn_selected {
-    background-color: #3267cd;
-}
-
-.panels {
-    width: 100%;
-    z-index: 1;
-    position: fixed;
-    background-color: #fff;
-    height: 80%;
-    bottom: 0;
-    border-radius: 10px;
-    overflow: hidden;
-    display: none;
-=======
-input {
+.input_file {
 	position: absolute;
 	left: 30px;
 	top: 85px;
@@ -264,5 +248,4 @@ input {
 	opacity: 0;
 	border: none;
 	cursor: pointer;
->>>>>>> 163d8c619e5bca4e52dfc90731b1860b82ef312c
 }
