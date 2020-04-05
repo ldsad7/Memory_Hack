@@ -178,14 +178,14 @@ body {
     text-align: center;
 }
 
-#photo_input {
+/* - {
     width: 0.1px;
     height: 0.1px;
     opacity: 0;
     overflow: hidden;
     position: absolute;
     z-index: -1;
-}
+} */
 
 
 
@@ -238,6 +238,10 @@ body {
 
 .bottom_colorize span:before{
     background-image: url(../img/editor_icons/colorize.svg);
+}
+
+.btn_selected {
+    background-color: #3267cd;
 }
 
 .panels {
